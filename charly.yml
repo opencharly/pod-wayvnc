@@ -1,7 +1,7 @@
 version: 2026.232.0520
 wayvnc:
     candy:
-        version: 2026.144.1443
+        version: 2026.243.0100
         description: |
             WayVNC headless VNC server exposing a wlroots Wayland desktop on TCP 5900
             Installs the wayvnc package (the /usr/bin/wayvnc server) plus a
@@ -11,7 +11,7 @@ wayvnc:
             scope; at deploy scope the wayvnc service runs and the VNC port
             accepts a TCP connection.
         require:
-            - '@github.com/opencharly/layer-supervisord:v2026.235.2056'
+            - '@github.com/opencharly/layer-supervisord:v2026.240.0121'
         port:
             - tcp:5900
         distro:
