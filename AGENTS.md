@@ -21,6 +21,8 @@ Canonical files:
 - `/charly-selkies:sway` — the Wayland compositor providing the display.
 - `/charly-selkies:sway-desktop-vnc` — the VNC composition that includes wayvnc.
 - `/charly-check:vnc` — the `vnc:` check verb (screenshot, click, type).
+- `/charly-pod:pod` — the `kind: pod` / deploy schema reference (this candy is
+  composed into a box; services).
 - `/charly-image:layer` — the candy authoring reference (`charly.yml` schema,
   `plan:` step verbs incl. `copy:` / `check:`, service declarations).
 - `/charly-check:check` — the check/R10 framework (`charly check box`,
