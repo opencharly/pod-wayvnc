@@ -13,6 +13,11 @@ wayvnc:
         port:
             - tcp:5900
         distro:
+            # `arch` also covers CachyOS (its distro tags are [cachyos, arch]).
+            # Arch ships the latest upstream wayvnc (0.10.2 as of 2026-11).
+            arch:
+                package:
+                    - wayvnc
             fedora:
                 package:
                     - wayvnc
@@ -40,6 +45,30 @@ wayvnc:
               file:
                 file: /usr/bin/wayvnc
                 exists: true
+            - check: the wrapper serves whichever output it is told (WAYVNC_OUTPUT) instead of hard-coding HEADLESS-1, and gates the power-on workaround to wayvnc <= 0.9.1
+              id: wayvnc-wrapper-generic
+              file:
+                file: ${HOME}/.local/bin/wayvnc-wrapper
+                contains:
+                    - contains: 'WAYVNC_ARGS="$WAYVNC_ARGS -o $WAYVNC_OUTPUT"'
+                    - contains: "wayvnc_needs_power_on"
+                    - not_contains: "-o HEADLESS-1"
+            - check: the installed wrapper's version gate runs the power-on workaround for wayvnc <= 0.9.1 and an unparseable version, and skips it from 0.10 on (executed against fake wayvnc --version outputs)
+              id: wayvnc-power-on-gate
+              exit_status: 0
+              stdout:
+                  - contains: "wayvnc: 0.9.1=needs"
+                  - contains: "wayvnc: v0.8.0=needs"
+                  - contains: "wayvnc: 0.10.2=skip"
+                  - contains: "wayvnc 0.10.1=skip"
+                  - contains: "garbage=needs"
+              command: |
+                f=$(mktemp)
+                sed -n '/^wayvnc_needs_power_on() {/,/^}/p' ${HOME}/.local/bin/wayvnc-wrapper > "$f"
+                for v in "wayvnc: 0.9.1" "wayvnc: v0.8.0" "wayvnc: 0.10.2" "wayvnc 0.10.1" "garbage"; do
+                  if sh -c ". \"$f\"; wayvnc() { echo \"$v\"; }; wayvnc_needs_power_on"; then printf '%s=needs\n' "$v"; else printf '%s=skip\n' "$v"; fi
+                done
+                rm -f "$f"
             - check: the wayvnc launcher wrapper is installed and executable
               file:
                 file: ${HOME}/.local/bin/wayvnc-wrapper
